@@ -1,3 +1,4 @@
+import bcrypt
 from app.models.used_car import UsedCar
 from app.models.user import User
 from app.models.kijiji_car import KijijiCar
@@ -71,6 +72,9 @@ async def fetch_car_by_price(id: int) -> list:
 
 
 async def create_user(user: User):
+    hashed_password = bcrypt.hashpw(user['password'].encode('utf-8'), bcrypt.gensalt())
+    user['password'] = hashed_password
     result = await user_collection.insert_one(user)
     created_user = await user_collection.find_one({'_id': result.inserted_id})
+    print(created_user['password'])
     return created_user
